@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "mwl",
+	"version": "${version}",
+	"name": "ModWhiteList",
+	"description": "Я хз",
+	"authors": [
+		"Hantu", "Schizophrenia"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/user/__Hantu__",
+		"sources": "https://github.com/Hantu-off/MWL"
+	},
+	"license": "GNU GPL-3.0-only",
+	"icon": "assets/mwl/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"ru.hantu.MWL"
+		],
+		"client": [
+			"ru.hantu.client.MWLClient"
+		]
+	},
+	"mixins": [
+		"mwl.mixins.json",
+		{
+			"config": "mwl.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
