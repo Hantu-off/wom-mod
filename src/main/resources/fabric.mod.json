@@ -3,36 +3,37 @@
 	"id": "mwl",
 	"version": "${version}",
 	"name": "ModWhiteList",
-	"description": "Я хз",
+	"description": "A robust server-side mod whitelist/blacklist checker with anti-spoofing protection.",
 	"authors": [
-		"Hantu", "Schizophrenia"
+		"Hantu",
+		"Hantu-off",
+		"Ханты-Мансийский Автономный Округ"
 	],
 	"contact": {
-		"homepage": "https://modrinth.com/user/__Hantu__",
-		"sources": "https://github.com/Hantu-off/MWL"
+		"homepage": "https://modrinth.com/user/6tSFinLU",
+		"sources": "https://github.com/Hantu-off/mwl-mod"
 	},
-	"license": "GNU GPL-3.0-only",
+	"license": "MIT",
 	"icon": "assets/mwl/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
 			"ru.hantu.MWL"
 		],
+		"server": [
+			"ru.hantu.MWLServer"
+		],
 		"client": [
 			"ru.hantu.client.MWLClient"
 		]
 	},
-	"mixins": [
-		"mwl.mixins.json",
-		{
-			"config": "mwl.client.mixins.json",
-			"environment": "client"
-		}
-	],
 	"depends": {
-		"fabricloader": ">=0.19.3",
-		"minecraft": "~26.2",
+		"fabricloader": ">=0.19.0",
+		"minecraft": "26.2",
 		"java": ">=25",
 		"fabric-api": "*"
+	},
+	"suggests": {
+		"modmenu": "*"
 	}
 }
