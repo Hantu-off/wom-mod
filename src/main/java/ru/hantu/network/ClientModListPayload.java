@@ -4,39 +4,42 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import ru.hantu.MWL;
+import ru.hantu.WoM;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-public record ClientModListPayload(Map<String, String> modIdToName, long nonce, String mwlVersion) implements CustomPacketPayload {
+public record ClientModListPayload(List<ModInfo> mods, long nonce, String womVersion) implements CustomPacketPayload {
     public static final Type<ClientModListPayload> ID =
-            new Type<>(MWL.id("client_mod_list"));
+            new Type<>(WoM.id("client_mod_list"));
 
-    // Используем StreamCodec с ручной сериализацией Map (гарантированно работает в 26.2)
+    public record ModInfo(String id, String name, String version, String author, long size) {}
+
     public static final StreamCodec<RegistryFriendlyByteBuf, ClientModListPayload> CODEC =
             StreamCodec.of(
                     (buf, payload) -> {
-                        // 1. Записываем размер карты
-                        buf.writeVarInt(payload.modIdToName().size());
-                        // 2. Записываем каждую пару Ключ (ID) -> Значение (Название)
-                        for (Map.Entry<String, String> entry : payload.modIdToName().entrySet()) {
-                            buf.writeUtf(entry.getKey());
-                            buf.writeUtf(entry.getValue());
+                        buf.writeVarInt(payload.mods().size());
+                        for (ModInfo mod : payload.mods()) {
+                            buf.writeUtf(mod.id());
+                            buf.writeUtf(mod.name());
+                            buf.writeUtf(mod.version());
+                            buf.writeUtf(mod.author());
+                            buf.writeLong(mod.size());
                         }
-                        // 3. Записываем nonce и версию
                         buf.writeLong(payload.nonce());
-                        buf.writeUtf(payload.mwlVersion());
+                        buf.writeUtf(payload.womVersion());
                     },
                     buf -> {
-                        // 1. Читаем размер карты
                         int count = buf.readVarInt();
-                        Map<String, String> mods = new HashMap<>();
-                        // 2. Читаем каждую пару
+                        List<ModInfo> mods = new ArrayList<>();
                         for (int i = 0; i < count; i++) {
-                            mods.put(buf.readUtf(), buf.readUtf());
+                            String id = buf.readUtf();
+                            String name = buf.readUtf();
+                            String version = buf.readUtf();
+                            String author = buf.readUtf();
+                            long size = buf.readLong();
+                            mods.add(new ModInfo(id, name, version, author, size));
                         }
-                        // 3. Читаем nonce и версию
                         long nonce = buf.readLong();
                         String version = buf.readUtf();
                         return new ClientModListPayload(mods, nonce, version);

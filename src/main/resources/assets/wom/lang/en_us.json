@@ -1,0 +1,15 @@
+{
+  "wom.kick.title": "§c§l⚠ ACCESS DENIED ⚠",
+  "wom.kick.line1": "§7The §cWoM §7mod has blocked your connection.",
+  "wom.kick.line2": "§7Reason: §f%s",
+  "wom.kick.line3": "§7If you believe this is a mistake, please contact the administration.",
+  "wom.command.reload.success": "§a[§2WoM§a] §fConfig successfully reloaded!",
+  "wom.command.whitelist.add.success": "§a[§2WoM§a] §fMod §e%s §fadded to whitelist.",
+  "wom.command.whitelist.add.already": "§c[§4WoM§c] §fThis mod is already in the whitelist.",
+  "wom.command.whitelist.remove.success": "§a[§2WoM§a] §fMod §e%s §fremoved from whitelist.",
+  "wom.command.whitelist.remove.notfound": "§c[§4WoM§c] §fThis mod is not in the whitelist.",
+  "wom.command.blacklist.add.success": "§a[§2WoM§a] §fMod §e%s §fadded to blacklist.",
+  "wom.command.blacklist.add.already": "§c[§4WoM§c] §fThis mod is already in the blacklist.",
+  "wom.command.blacklist.remove.success": "§a[§2WoM§a] §fMod §e%s §fremoved from blacklist.",
+  "wom.command.blacklist.remove.notfound": "§c[§4WoM§c] §fThis mod is not in the blacklist."
+}

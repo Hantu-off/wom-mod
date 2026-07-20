@@ -1,0 +1,15 @@
+{
+  "wom.kick.title": "§c§l⚠ ДОСТУП ЗАПРЕЩЁН ⚠",
+  "wom.kick.line1": "§7Мод §cWoM §7заблокировал ваше подключение.",
+  "wom.kick.line2": "§7Причина: §f%s",
+  "wom.kick.line3": "§7Если вы считаете, что это ошибка, обратитесь к администрации.",
+  "wom.command.reload.success": "§a[§2WoM§a] §fКонфиг успешно перезагружен!",
+  "wom.command.whitelist.add.success": "§a[§2WoM§a] §fМод §e%s §fдобавлен в белый список.",
+  "wom.command.whitelist.add.already": "§c[§4WoM§c] §fЭтот мод уже есть в белом списке.",
+  "wom.command.whitelist.remove.success": "§a[§2WoM§a] §fМод §e%s §fудалён из белого списка.",
+  "wom.command.whitelist.remove.notfound": "§c[§4WoM§c] §fЭтого мода нет в белом списке.",
+  "wom.command.blacklist.add.success": "§a[§2WoM§a] §fМод §e%s §fдобавлен в чёрный список.",
+  "wom.command.blacklist.add.already": "§c[§4WoM§c] §fЭтот мод уже есть в чёрном списке.",
+  "wom.command.blacklist.remove.success": "§a[§2WoM§a] §fМод §e%s §fудалён из чёрного списка.",
+  "wom.command.blacklist.remove.notfound": "§c[§4WoM§c] §fЭтого мода нет в чёрном списке."
+}
