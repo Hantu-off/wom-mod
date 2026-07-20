@@ -7,31 +7,31 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import net.fabricmc.loader.api.FabricLoader;
 import ru.hantu.WoM;
+import ru.hantu.i18n.Translations;
 
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WoMConfig {
     private static final Path CONFIG_PATH = FabricLoader.getInstance().getConfigDir().resolve("wom.json");
 
-    // Регистрация адаптера для красивого много-строчного вывода документации
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
             .disableHtmlEscaping()
             .registerTypeAdapter(MultiLineString.class, new MultiLineStringAdapter())
             .create();
 
-    // Обёртка для много-строчного текста
     public static class MultiLineString {
         public String value;
         public MultiLineString(String value) { this.value = value; }
     }
 
-    // Адаптер, который превращает текст в красивый массив строк в JSON
     public static class MultiLineStringAdapter extends TypeAdapter<MultiLineString> {
         @Override
         public void write(JsonWriter out, MultiLineString value) throws IOException {
@@ -40,7 +40,6 @@ public class WoMConfig {
                 return;
             }
             out.beginArray();
-            // Разбиваем текст по строкам и записываем каждую как отдельный элемент массива
             for (String line : value.value.split("\\r?\\n", -1)) {
                 out.value(line);
             }
@@ -50,10 +49,8 @@ public class WoMConfig {
         @Override
         public MultiLineString read(JsonReader in) throws IOException {
             if (in.peek() == JsonToken.STRING) {
-                // Обратная совместимость: читаем старый формат с \n
                 return new MultiLineString(in.nextString().replace("\\n", "\n"));
             } else if (in.peek() == JsonToken.BEGIN_ARRAY) {
-                // Читаем новый красивый формат массива
                 in.beginArray();
                 StringBuilder sb = new StringBuilder();
                 while (in.hasNext()) {
@@ -75,6 +72,11 @@ public class WoMConfig {
         INSTALLATION:
           - Server: Place wom.jar in server's mods/ folder
           - Client: All players must also install wom.jar
+        
+        LANGUAGE:
+          - Available: en_us, ru_ru, de_de, es_es, fr_fr, pt_br,
+            ja_jp, zh_cn, ko_kr, tr_tr, it_it, pl_pl
+          - You can override any message in the "messages" section
         
         CHECK_TYPE:
           - "WHITELIST": Only mods in the whitelist are allowed
@@ -105,6 +107,11 @@ public class WoMConfig {
             (prevents spam from reconnections). Default: 3600000 (1 hour)
           - log_path: Relative path from config folder for player logs
         
+        MESSAGES:
+          - Override any built-in message by adding it to this section
+          - Use %s for placeholders (e.g., player name, mod name)
+          - Leave empty or delete to use built-in translation
+        
         WHITELIST/BLACKLIST RULES:
           - "id": Mod ID (required)
           - "version": Version pattern (optional, e.g., "1.0.*" or "1.0.0")
@@ -117,9 +124,12 @@ public class WoMConfig {
           With version: {"id": "sodium", "version": "0.6.*"}
           Full check: {"id": "sodium", "version": "0.6.*", "author": "CaffeineMC", "min_size": 500000}
         
-        Use /mwl commands in-game to modify this config safely.
+        Use /wom commands in-game to modify this config safely.
         ============================================
         """);
+
+    @SerializedName("language")
+    public String language = "en_us";
 
     @SerializedName("check_type")
     public String check_type = "WHITELIST";
@@ -142,6 +152,9 @@ public class WoMConfig {
     @SerializedName("log_path")
     public String log_path = "players";
 
+    @SerializedName("messages")
+    public Map<String, String> messages = new HashMap<>();
+
     @SerializedName("whitelist")
     public List<ModRule> whitelist = new ArrayList<>();
 
@@ -149,24 +162,31 @@ public class WoMConfig {
     public List<ModRule> blacklist = new ArrayList<>();
 
     public static class ModRule {
-        @SerializedName("id")
-        public String id;
+        @SerializedName("id") public String id;
+        @SerializedName("version") public String version;
+        @SerializedName("author") public String author;
+        @SerializedName("min_size") public Long min_size;
+        @SerializedName("max_size") public Long max_size;
 
-        @SerializedName("version")
-        public String version;
+        public ModRule(String id) { this.id = id; }
+    }
 
-        @SerializedName("author")
-        public String author;
+    /**
+     * Gets a translated message with format arguments.
+     */
+    public String formatMessage(String key, Object... args) {
+        return String.format(getMessage(key), args);
+    }
 
-        @SerializedName("min_size")
-        public Long min_size;
-
-        @SerializedName("max_size")
-        public Long max_size;
-
-        public ModRule(String id) {
-            this.id = id;
+    /**
+     * Gets a translated message, checking custom overrides first.
+     */
+    public String getMessage(String key) {
+        String custom = messages.get(key);
+        if (custom != null && !custom.isEmpty()) {
+            return custom;
         }
+        return Translations.get(language, key);
     }
 
     public static WoMConfig load() {
@@ -176,17 +196,19 @@ public class WoMConfig {
             defaultConfig.whitelist.add(new ModRule("fabric-api"));
             defaultConfig.whitelist.add(new ModRule("wom"));
 
-            ModRule sodium = new ModRule("sodium");
-            sodium.version = "0.6.*";
-            sodium.author = "CaffeineMC";
-            sodium.min_size = 500000L;
-            defaultConfig.whitelist.add(sodium);
-
             defaultConfig.save();
             return defaultConfig;
         }
         try (FileReader reader = new FileReader(CONFIG_PATH.toFile())) {
-            return GSON.fromJson(reader, WoMConfig.class);
+            WoMConfig config = GSON.fromJson(reader, WoMConfig.class);
+
+            // Убеждаемся, что поле language не null
+            if (config.language == null) {
+                config.language = "en_us";
+            }
+
+
+            return config;
         } catch (IOException e) {
             WoM.LOGGER.error("Failed to load WoM config!", e);
             return new WoMConfig();

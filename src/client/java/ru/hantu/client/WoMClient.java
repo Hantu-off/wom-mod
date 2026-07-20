@@ -28,38 +28,26 @@ public class WoMClient implements ClientModInitializer {
 				ModMetadata metadata = modContainer.getMetadata();
 				String id = metadata.getId();
 
-				// Пропускаем системные "моды"
 				if (!id.equals("minecraft") && !id.equals("java") && !id.equals("fabricloader")) {
 					String name = metadata.getName();
 					String version = metadata.getVersion().getFriendlyString();
+					String author = metadata.getAuthors().stream().findFirst().map(Person::getName).orElse("Unknown");
 
-					// Получаем первого автора
-					String author = metadata.getAuthors().stream()
-							.findFirst()
-							.map(Person::getName)
-							.orElse("Unknown");
-
-					// Получаем реальный размер JAR файла(ов) мода
 					long size = 0;
 					try {
 						for (Path path : modContainer.getOrigin().getPaths()) {
 							size += Files.size(path);
 						}
 					} catch (IOException | UnsupportedOperationException e) {
-						// Игнорируем ошибки.
-						// UnsupportedOperationException возникает для вложенных (NESTED) модов,
-						// у которых нет прямого пути к файлу (например, подмодули Fabric API).
-						// Для них размер останется 0, что безопасно.
+						// Игнорируем ошибки для вложенных (NESTED) модов
 					}
-
 					mods.add(new ClientModListPayload.ModInfo(id, name, version, author, size));
 				}
 			});
 
 			long nonce = System.currentTimeMillis() ^ (long)(Math.random() * Long.MAX_VALUE);
 			String version = FabricLoader.getInstance().getModContainer("wom")
-					.map(container -> container.getMetadata().getVersion().getFriendlyString())
-					.orElse("unknown");
+					.map(c -> c.getMetadata().getVersion().getFriendlyString()).orElse("unknown");
 
 			sender.sendPacket(new ClientModListPayload(mods, nonce, version));
 		});

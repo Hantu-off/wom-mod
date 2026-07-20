@@ -14,10 +14,10 @@ public class WoM implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		CONFIG = WoMConfig.load();
-		LOGGER.info("WoM загружен! Конфиг находится в config/wom.json");
+		LOGGER.info("WoM (Whitelist of Mods) loaded! Config is at config/wom.json");
 	}
 
 	public static Identifier id(String path) {
-		return Identifier.fromNamespaceAndPath(MOD_ID, path); // Современный аналог fromNamespaceAndPath
+		return Identifier.fromNamespaceAndPath(MOD_ID, path);
 	}
 }

@@ -7,11 +7,11 @@
 	"authors": [
 		"Hantu",
 		"Hantu-off",
-		"Ханты-Мансийский Автономный Округ"
+		"Ханты-Мансийский Автономный Округ",
+		"Cyminiki"
 	],
 	"contact": {
-		"homepage": "https://github.com/Hantu-off/wom-mod",
-		"sources": "https://github.com/Hantu-off/wom-mod"
+		"homepage": "https://modrinth.com/user/__Hantu__"
 	},
 	"license": "ARR",
 	"icon": "assets/wom/icon.png",

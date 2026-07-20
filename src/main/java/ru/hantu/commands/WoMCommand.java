@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import ru.hantu.WoM;
 import ru.hantu.config.WoMConfig;
+import ru.hantu.i18n.Translations;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -26,7 +27,7 @@ public class WoMCommand {
                 .then(Commands.literal("reload")
                         .executes(ctx -> {
                             WoM.CONFIG = WoMConfig.load();
-                            ctx.getSource().sendSuccess(() -> Component.literal("§a[§2WoM§a] §fConfig successfully reloaded!"), false);
+                            ctx.getSource().sendSuccess(() -> Component.literal(WoM.CONFIG.getMessage(Translations.CMD_RELOAD_SUCCESS)), false);
                             return 1;
                         })
                 )
@@ -35,10 +36,9 @@ public class WoMCommand {
                                 .then(Commands.argument("mod_id", StringArgumentType.string())
                                         .executes(ctx -> {
                                             String modId = StringArgumentType.getString(ctx, "mod_id").toLowerCase();
-                                            WoMConfig.ModRule rule = new WoMConfig.ModRule(modId);
-                                            WoM.CONFIG.whitelist.add(rule);
+                                            WoM.CONFIG.whitelist.add(new WoMConfig.ModRule(modId));
                                             WoM.CONFIG.save();
-                                            ctx.getSource().sendSuccess(() -> Component.literal("§a[§2WoM§a] §fMod §e" + modId + " §fadded to whitelist."), false);
+                                            ctx.getSource().sendSuccess(() -> Component.literal(WoM.CONFIG.formatMessage(Translations.CMD_WHITELIST_ADD_SUCCESS, modId)), false);
                                             return 1;
                                         })
                                         .then(Commands.argument("version", StringArgumentType.string())
@@ -49,7 +49,7 @@ public class WoMCommand {
                                                     rule.version = version;
                                                     WoM.CONFIG.whitelist.add(rule);
                                                     WoM.CONFIG.save();
-                                                    ctx.getSource().sendSuccess(() -> Component.literal("§a[§2WoM§a] §fMod §e" + modId + " §fadded with version §e" + version), false);
+                                                    ctx.getSource().sendSuccess(() -> Component.literal(WoM.CONFIG.formatMessage(Translations.CMD_WHITELIST_ADD_SUCCESS, modId + " (v: " + version + ")")), false);
                                                     return 1;
                                                 })
                                         )
@@ -60,12 +60,11 @@ public class WoMCommand {
                                         .suggests((ctx, builder) -> suggestFromList(WoM.CONFIG.whitelist.stream().map(r -> r.id).toList(), builder))
                                         .executes(ctx -> {
                                             String modId = StringArgumentType.getString(ctx, "mod_id").toLowerCase();
-                                            boolean removed = WoM.CONFIG.whitelist.removeIf(rule -> rule.id.equals(modId));
-                                            if (removed) {
+                                            if (WoM.CONFIG.whitelist.removeIf(rule -> rule.id.equals(modId))) {
                                                 WoM.CONFIG.save();
-                                                ctx.getSource().sendSuccess(() -> Component.literal("§a[§2WoM§a] §fMod §e" + modId + " §fremoved from whitelist."), false);
+                                                ctx.getSource().sendSuccess(() -> Component.literal(WoM.CONFIG.formatMessage(Translations.CMD_WHITELIST_REMOVE_SUCCESS, modId)), false);
                                             } else {
-                                                ctx.getSource().sendFailure(Component.literal("§c[§4WoM§c] §fThis mod is not in the whitelist."));
+                                                ctx.getSource().sendFailure(Component.literal(WoM.CONFIG.getMessage(Translations.CMD_WHITELIST_REMOVE_NOTFOUND)));
                                             }
                                             return 1;
                                         })
@@ -77,24 +76,11 @@ public class WoMCommand {
                                 .then(Commands.argument("mod_id", StringArgumentType.string())
                                         .executes(ctx -> {
                                             String modId = StringArgumentType.getString(ctx, "mod_id").toLowerCase();
-                                            WoMConfig.ModRule rule = new WoMConfig.ModRule(modId);
-                                            WoM.CONFIG.blacklist.add(rule);
+                                            WoM.CONFIG.blacklist.add(new WoMConfig.ModRule(modId));
                                             WoM.CONFIG.save();
-                                            ctx.getSource().sendSuccess(() -> Component.literal("§a[§2WoM§a] §fMod §e" + modId + " §fadded to blacklist."), false);
+                                            ctx.getSource().sendSuccess(() -> Component.literal(WoM.CONFIG.formatMessage(Translations.CMD_BLACKLIST_ADD_SUCCESS, modId)), false);
                                             return 1;
                                         })
-                                        .then(Commands.argument("version", StringArgumentType.string())
-                                                .executes(ctx -> {
-                                                    String modId = StringArgumentType.getString(ctx, "mod_id").toLowerCase();
-                                                    String version = StringArgumentType.getString(ctx, "version");
-                                                    WoMConfig.ModRule rule = new WoMConfig.ModRule(modId);
-                                                    rule.version = version;
-                                                    WoM.CONFIG.blacklist.add(rule);
-                                                    WoM.CONFIG.save();
-                                                    ctx.getSource().sendSuccess(() -> Component.literal("§a[§2WoM§a] §fMod §e" + modId + " §fadded with version §e" + version), false);
-                                                    return 1;
-                                                })
-                                        )
                                 )
                         )
                         .then(Commands.literal("remove")
@@ -102,12 +88,11 @@ public class WoMCommand {
                                         .suggests((ctx, builder) -> suggestFromList(WoM.CONFIG.blacklist.stream().map(r -> r.id).toList(), builder))
                                         .executes(ctx -> {
                                             String modId = StringArgumentType.getString(ctx, "mod_id").toLowerCase();
-                                            boolean removed = WoM.CONFIG.blacklist.removeIf(rule -> rule.id.equals(modId));
-                                            if (removed) {
+                                            if (WoM.CONFIG.blacklist.removeIf(rule -> rule.id.equals(modId))) {
                                                 WoM.CONFIG.save();
-                                                ctx.getSource().sendSuccess(() -> Component.literal("§a[§2WoM§a] §fMod §e" + modId + " §fremoved from blacklist."), false);
+                                                ctx.getSource().sendSuccess(() -> Component.literal(WoM.CONFIG.formatMessage(Translations.CMD_BLACKLIST_REMOVE_SUCCESS, modId)), false);
                                             } else {
-                                                ctx.getSource().sendFailure(Component.literal("§c[§4WoM§c] §fThis mod is not in the blacklist."));
+                                                ctx.getSource().sendFailure(Component.literal(WoM.CONFIG.getMessage(Translations.CMD_BLACKLIST_REMOVE_NOTFOUND)));
                                             }
                                             return 1;
                                         })
